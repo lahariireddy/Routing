@@ -7,5 +7,6 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="darkGrey">#ACACACAC</color>
+    <color name="borderGrey">#ACC0C0C0</color>
     <color name="navBlue">#056DBE</color>
 </resources>

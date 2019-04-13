@@ -148,6 +148,9 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 String str = (String) adapterView.getItemAtPosition(position);
+
+                Toast.makeText(RoutingActivity.this,"Source: "+str , Toast.LENGTH_LONG).show();
+
                 LatLng latLng = null;
                 try {
                     if(str!="") {
@@ -202,6 +205,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 String str = (String) adapterView.getItemAtPosition(position);
+                Toast.makeText(RoutingActivity.this,"Destination: "+str , Toast.LENGTH_LONG).show();
 
                 LatLng latLng = null;
                 try {
@@ -295,7 +299,9 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     }
 
-
+    /**
+     * Begin : Methods for autocomplete
+     **/
     public void onItemClick(AdapterView adapterView, View view, int position, long id) {
         String str = (String) adapterView.getItemAtPosition(position);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
@@ -405,9 +411,16 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         }
     }
 
+    /**
+     * End : Methods for autocomplete
+     **/
 
 
-    //Executed if source and dest is entered, but searchs aren't pressed
+
+
+    /**
+     * Method for getting source and dest after getDirections is clicked
+     **/
     public void getSourceDestMarker() {
         //Get Source Marker
         String location = sourceAutoCompView.getText().toString();
@@ -494,7 +507,11 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     }
 
-    //Adds curr, source and dest markers
+
+
+    /**
+     * Method for adding current location, source and destination markers to map
+     **/
     public void addAllMarkers(){
         if(hashMapMarker.get("source")!=null){
             mMap.addMarker(hashMapMarker.get("source"));
@@ -508,7 +525,10 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     }
 
-    //Convert string to lat, lng
+
+    /**
+     * Method to convert a String to LatLng
+     **/
     public LatLng getLatLng(String location) throws IOException {
         Geocoder geocoder = new Geocoder(this);
         List<Address> addresses;
@@ -525,6 +545,31 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         return null;
 
     }
+
+
+    /**
+     * Method to convert LatLng to address
+     **/
+    public String getAddress(double lat, double lng) throws IOException {
+
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(this, Locale.getDefault());
+
+        addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+
+        String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+        String city = addresses.get(0).getLocality();
+        String state = addresses.get(0).getAdminArea();
+        String country = addresses.get(0).getCountryName();
+        String postalCode = addresses.get(0).getPostalCode();
+        String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
+
+        return address;
+
+    }
+
+
 
     private boolean CheckGooglePlayServices() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
@@ -568,7 +613,9 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     }
 
 
-    //Get URL for getting data from Directions API
+    /**
+     * Get URL for getting data from Directions API
+     **/
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -653,25 +700,6 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     }
 
-    //Convert lat, lng coordinate to address
-    public String getAddress(double lat, double lng) throws IOException {
-
-        Geocoder geocoder;
-        List<Address> addresses;
-        geocoder = new Geocoder(this, Locale.getDefault());
-
-        addresses = geocoder.getFromLocation(lat, lng, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-
-        String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-        String city = addresses.get(0).getLocality();
-        String state = addresses.get(0).getAdminArea();
-        String country = addresses.get(0).getCountryName();
-        String postalCode = addresses.get(0).getPostalCode();
-        String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
-
-        return address;
-
-    }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     public boolean checkLocationPermission(){
