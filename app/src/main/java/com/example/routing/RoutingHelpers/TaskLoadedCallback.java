@@ -1,6 +1,10 @@
 package com.example.routing.RoutingHelpers;
 
 
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.List;
+
 public interface TaskLoadedCallback {
-    void onTaskDone(Object... values);
+    void onTaskDone(int token, List<PolylineOptions> poly);
 }

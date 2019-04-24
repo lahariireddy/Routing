@@ -11,10 +11,10 @@
         android:layout_height="match_parent"
         />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="1dp">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp">
         <AutoCompleteTextView
             android:id="@+id/sourceAutoCompleteTextView"
             android:layout_width="match_parent"
@@ -30,6 +30,7 @@
             >
             <requestFocus />
         </AutoCompleteTextView>
+
         <AutoCompleteTextView
             android:id="@+id/destinationAutoCompleteTextView"
             android:layout_width="match_parent"
@@ -43,17 +44,23 @@
             android:drawableLeft="@drawable/ic_search_icon"
             android:drawablePadding="10dp"
             android:singleLine="true"
+            android:layout_marginTop="1dp"
             >
             <requestFocus />
         </AutoCompleteTextView>
 
+        <RelativeLayout
+            android:id="@+id/layout_icons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/destinationAutoCompleteTextView"
+            android:paddingTop="6dp"
+            android:paddingLeft="6dp">
+
             <RelativeLayout
-                android:id="@+id/layout_hospitals"
+                android:id="@+id/layout_hospital"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/destinationAutoCompleteTextView"
-                android:paddingTop="6dp"
-                android:paddingLeft="6dp">
+                android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/btnNearbyHospitals"
@@ -61,14 +68,16 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_hospital"
                 android:padding="0dp"
-                android:background="@drawable/icons_background"
+                android:background="@drawable/hospital_icon_background"
                 />
+        </RelativeLayout>
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnNearbyHospitals"
-                    android:paddingTop="6dp"
+            <RelativeLayout
+                android:id="@+id/layout_police"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/layout_hospital"
+                android:paddingTop="6dp"
                 >
 
                 <ImageView
@@ -79,11 +88,11 @@
                     android:background="@drawable/icons_background"
                     android:padding="0dp"
                     />
-                </RelativeLayout>
-
-
             </RelativeLayout>
+
+
         </RelativeLayout>
+    </RelativeLayout>
 
 
 
@@ -97,9 +106,6 @@
         android:textSize="15dp"
         android:gravity="center_horizontal|center_vertical"
         android:textColor="@color/white" />
-
-
-
 
 
 
