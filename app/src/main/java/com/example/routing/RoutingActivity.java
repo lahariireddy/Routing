@@ -90,6 +90,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     HashMap<String,MarkerOptions> hashMapMarker;
     AutoCompleteTextView sourceAutoCompView, destAutoCompView;
     String currLoc = "";
+    String[] mPlaceType;
     Integer count;
     //ListView nearbyHospList, nearbyPoliceList;
     //ArrayList<String> nearbyHospArray, nearbyPoliceArray;
@@ -108,6 +109,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         setContentView(R.layout.activity_routing);
         getDirection = findViewById(R.id.btnGetDirection);
         hashMapMarker = new HashMap<>();
+        mPlaceType = new String[]{"hospital", "police_station" ,"bank", "mosque", "movie_theatre" ,"mall", "hindu_temple", "restaurant", "hotel", "store", "atm"};
 
 
 
@@ -853,35 +855,37 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     int masterCount = 0, localCount=0;
 
     int getNumberOfEstablishmentsForRoute(PolylineOptions polylineOptions) {
-        getDirection.setVisibility(View.INVISIBLE); 
-        int i;
+        getDirection.setVisibility(View.INVISIBLE);
+        int i, j;
         masterCount = 0;
         LatLng currentPoint;
         List<LatLng> points = polylineOptions.getPoints();
 
-        for(i=0;i<points.size();i=i+10) {
-            localCount = 0;
-            currentPoint = (LatLng) points.get(i);
-            StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-            sb.append("location=" + currentPoint.latitude + "," + currentPoint.longitude);
-            sb.append("&radius=50");
-            sb.append("&types=" + "hospitals");
-            sb.append("&sensor=true");
-            sb.append("&key=" + getString(R.string.google_maps_key));                                                 /** API KEY **/
-            sb.append("&opennow=true");
+        //for (j = 0; j < mPlaceType.length; j++){
+            for (i = 0; i < points.size(); i = i + 7) {
+                localCount = 0;
+                currentPoint = (LatLng) points.get(i);
+                StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+                sb.append("location=" + currentPoint.latitude + "," + currentPoint.longitude);
+                sb.append("&radius=50");
+                sb.append("&types=" + mPlaceType[0]);   //Only for hospitals
+                sb.append("&sensor=true");
+                sb.append("&key=" + getString(R.string.google_maps_key));                                                 /** API KEY **/
+                sb.append("&opennow=true");
 
-            // Creating a new non-ui thread task to download json data
-            PlacesTaskNonUI placesTaskNonUI = new PlacesTaskNonUI();
+                // Creating a new non-ui thread task to download json data
+                PlacesTaskNonUI placesTaskNonUI = new PlacesTaskNonUI();
 
-            // Invokes the "doInBackground()" method of the class PlaceTask
-            placesTaskNonUI.execute(sb.toString());
-            masterCount+=localCount;
-            Log.d("mastercount", "value: " + masterCount);
+                // Invokes the "doInBackground()" method of the class PlaceTask
+                placesTaskNonUI.execute(sb.toString());
+                masterCount += localCount;
+                Log.d("mastercount", "value: " + masterCount);
+            }
+            Log.d("master count final", "value: " + masterCount);
+            return masterCount;
+            //return Counter.getCount();
         }
-        Log.d("master count final", "value: " + masterCount);
-        return masterCount;
-        //return Counter.getCount();
-    }
+    //}
 
 
         /** A method to download json data from url */
