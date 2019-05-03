@@ -1,16 +1,12 @@
 package com.example.routing;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,13 +15,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.example.routing.RoutingHelpers.FetchURL;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -38,16 +32,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -59,9 +47,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 
 
 import com.example.routing.RoutingHelpers.TaskLoadedCallback;
@@ -105,6 +90,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     HashMap<String,MarkerOptions> hashMapMarker;
     AutoCompleteTextView sourceAutoCompView, destAutoCompView;
     String currLoc = "";
+    Integer count;
     //ListView nearbyHospList, nearbyPoliceList;
     //ArrayList<String> nearbyHospArray, nearbyPoliceArray;
     //HashMap<String, LatLng> hospitalNameToLatLngMap, policeNameToLatLngMap;
@@ -314,6 +300,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
                 //nearbyPoliceArray = new ArrayList<String>();
                 //policeNameToLatLngMap = new HashMap<String, LatLng>();
+                Toast.makeText(RoutingActivity.this,"Police Stations", Toast.LENGTH_LONG).show();
 
                 getNearby("police");
 
@@ -346,10 +333,10 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
         StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         sb.append("location=" + latitude + "," + longitude);
-        sb.append("&radius=2000");
+        sb.append("&radius=10000");
         sb.append("&types=" + placeType);
         sb.append("&sensor=true");
-        sb.append("&key=AIzaSyDu-CcNOu9R3RvWPVshJFDa7GHE0ezf1w4");
+        sb.append("&key=" + getString(R.string.google_maps_key));                                       /** API KEY **/
         sb.append("&opennow=true");
 
         // Creating a new non-ui thread task to download json data
@@ -454,7 +441,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
         // Executed after the complete execution of doInBackground() method
         @Override
-        protected void onPostExecute(List<HashMap<String,String>> list){
+        public void onPostExecute(List<HashMap<String,String>> list){
 
             // Clears all the existing markers
             // mMap.clear();
@@ -516,7 +503,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         StringBuilder jsonResults = new StringBuilder();
         try {
             StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_AUTOCOMPLETE + OUT_JSON);
-            sb.append("?key=" + "AIzaSyDu-CcNOu9R3RvWPVshJFDa7GHE0ezf1w4");
+            sb.append("?key=" + getString(R.string.google_maps_key));                                      /** API KEY **/
             sb.append("&components=country:in");
             sb.append("&input=" + URLEncoder.encode(input, "utf8"));
 
@@ -829,19 +816,186 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         // Output format
         String output = "json";
         // Building the url to the web service
+                                                                                                               /**API KEy **/
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
     }
 
     @Override
     public void onTaskDone(int count, List<PolylineOptions> poly) {
-        int i;
+        int i, maxIndex=0;
+        int[] estCount =  new int[count];
         for(i=0;i<count;i++){
             if(poly.get(i)!=null){
-                mMap.addPolyline((PolylineOptions)poly.get(i));
+                estCount[i] = (getNumberOfEstablishmentsForRoute((PolylineOptions)poly.get(i)));
+                if(estCount[maxIndex]<estCount[i])
+                    maxIndex = i;
+                //mMap.addPolyline((PolylineOptions)poly.get(i));
             }
         }
+        for(i=0;i<count;i++){
+            if(maxIndex != i) {
+                mMap.addPolyline((PolylineOptions) poly.get(i).color(Color.BLUE));
+            }
+            else{
+                mMap.addPolyline((PolylineOptions)poly.get(i).color(Color.MAGENTA));
+            }
+
+            }
+        mMap.addPolyline((PolylineOptions)poly.get(maxIndex).color(Color.MAGENTA));
+
+        }
+
+
+    /**
+     * Start: Methods and classes for getting nearby locations along a route
+     */
+    int masterCount = 0, localCount=0;
+
+    int getNumberOfEstablishmentsForRoute(PolylineOptions polylineOptions) {
+        getDirection.setVisibility(View.INVISIBLE); 
+        int i;
+        masterCount = 0;
+        LatLng currentPoint;
+        List<LatLng> points = polylineOptions.getPoints();
+
+        for(i=0;i<points.size();i=i+10) {
+            localCount = 0;
+            currentPoint = (LatLng) points.get(i);
+            StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+            sb.append("location=" + currentPoint.latitude + "," + currentPoint.longitude);
+            sb.append("&radius=50");
+            sb.append("&types=" + "hospitals");
+            sb.append("&sensor=true");
+            sb.append("&key=" + getString(R.string.google_maps_key));                                                 /** API KEY **/
+            sb.append("&opennow=true");
+
+            // Creating a new non-ui thread task to download json data
+            PlacesTaskNonUI placesTaskNonUI = new PlacesTaskNonUI();
+
+            // Invokes the "doInBackground()" method of the class PlaceTask
+            placesTaskNonUI.execute(sb.toString());
+            masterCount+=localCount;
+            Log.d("mastercount", "value: " + masterCount);
+        }
+        Log.d("master count final", "value: " + masterCount);
+        return masterCount;
+        //return Counter.getCount();
     }
+
+
+        /** A method to download json data from url */
+        private String downloadUrlNonUI (String strUrl) throws IOException {
+            String data = "";
+            InputStream iStream = null;
+            HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL(strUrl);
+
+                // Creating an http connection to communicate with url
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                // Connecting to url
+                urlConnection.connect();
+
+                // Reading data from url
+                iStream = urlConnection.getInputStream();
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+                StringBuffer sb = new StringBuffer();
+
+                String line = "";
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                data = sb.toString();
+
+                br.close();
+
+            } catch (Exception e) {
+                Log.d("Exception dwnloadng url", e.toString());
+            } finally {
+                iStream.close();
+                urlConnection.disconnect();
+            }
+
+            return data;
+        }
+
+        /** A class, to download Google Places */
+        private class PlacesTaskNonUI extends AsyncTask<String, Integer, String> {
+
+
+            String data = null;
+
+            // Invoked by execute() method of this object
+            @Override
+            protected String doInBackground(String... url) {
+                try {
+                    data = downloadUrlNonUI(url[0]);
+                } catch (Exception e) {
+                    Log.d("Background Task", e.toString());
+                }
+                return data;
+            }
+
+            // Executed after the complete execution of doInBackground() method
+            @Override
+            protected void onPostExecute(String result) {
+                ParserTaskNonUI parserTaskNonUI = new ParserTaskNonUI();
+
+                // Start parsing the Google places in JSON format
+                // Invokes the "doInBackground()" method of the class ParseTask
+                parserTaskNonUI.execute(result);
+            }
+
+
+        }
+
+        /** A class to parse the Google Places in JSON format */
+        private class ParserTaskNonUI extends AsyncTask<String, Integer, List<HashMap<String, String>>> {
+
+            JSONObject jObject;
+
+            // Invoked by execute() method of this object
+            @Override
+            protected List<HashMap<String, String>> doInBackground(String... jsonData) {
+
+                List<HashMap<String, String>> places = null;
+                PlaceJSONParser placeJsonParser = new PlaceJSONParser();
+
+                try {
+                    jObject = new JSONObject(jsonData[0]);
+
+                    /** Getting the parsed data as a List construct */
+                    places = placeJsonParser.parse(jObject);
+
+                } catch (Exception e) {
+                    Log.d("Exception", e.toString());
+                }
+
+                return places;
+            }
+
+            // Executed after the complete execution of doInBackground() method
+            @Override
+            public void onPostExecute(List<HashMap<String, String>> list) {
+
+
+                localCount= list.size();
+                //Counter.update(list.size());
+                Log.d("InParserNonUI", "value: " + localCount);
+
+            }
+
+        }
+
+
+    /**
+     * End : Methods and classes to get nearby locations along the route
+     */
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -982,3 +1136,6 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     }
 }
+
+
+

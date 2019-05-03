@@ -73,13 +73,13 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
             }
             // Adding all the points in the route to LineOptions
             lineOptions.addAll(points);
-            if (directionMode.equalsIgnoreCase("walking")) {
+            /*if (directionMode.equalsIgnoreCase("walking")) {
                 lineOptions.width(10);
                 lineOptions.color(Color.MAGENTA);
             } else {
                 lineOptions.width(17);
                 lineOptions.color(Color.BLUE);
-            }
+            }*/
             arr.add(lineOptions);
             Log.d("mylog", "onPostExecute lineoptions decoded");
         }

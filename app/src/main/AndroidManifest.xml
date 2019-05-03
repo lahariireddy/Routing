@@ -22,7 +22,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDu-CcNOu9R3RvWPVshJFDa7GHE0ezf1w4" />
+            android:value="AIzaSyCXLP_pqSc2Otq7ZpT9SgXLdx4-CrRgv2M" />
 
         <activity android:name=".RoutingActivity">
             <intent-filter>
