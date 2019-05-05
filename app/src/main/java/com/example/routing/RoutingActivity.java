@@ -1,7 +1,9 @@
 package com.example.routing;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -825,6 +827,48 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
     @Override
     public void onTaskDone(int count, List<PolylineOptions> poly) {
+
+        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener()
+        {
+            @Override
+            public void onPolylineClick(Polyline polyline)
+            {
+                polyline.setColor(Color.MAGENTA);
+
+                //Getting the waypoints for navigation
+                List<LatLng> listWay  = polyline.getPoints();
+                int iter, wayIndex=0;
+
+                String[] waypoints = new String[8];
+                LatLng point;
+                int interval = listWay.size()/9;
+                for(iter=interval;iter<listWay.size();iter+=interval){
+                    point = listWay.get(iter);
+                    waypoints[wayIndex]= "" + point.latitude + "," + point.longitude ;
+                    wayIndex++;
+                    if(wayIndex==8 || iter >= listWay.size())
+                        break;
+                }
+
+                String waypointStr = String.join("|", waypoints);
+
+                if (sourceMarker != null && destMarker != null) {
+                    String uri = "https://www.google.com/maps/dir/?api=1&origin=" + sourceMarker.getPosition().latitude + "," + sourceMarker.getPosition().longitude + "&destination=" + latitude + "," + longitude + "&waypoints=" + waypointStr + "&travelmode=driving&dir_action=navigate";
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                    intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    startActivity(intent);
+                }
+                if(sourceMarker == null && destMarker!=null){
+                    String uri = "https://www.google.com/maps/dir/?api=1&origin=" + mCurrLocationMarker.getPosition().latitude + "," + mCurrLocationMarker.getPosition().longitude + "&destination=" + latitude + "," + longitude + "&waypoints=" + waypointStr + "&travelmode=driving&dir_action=navigate";
+                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+                    intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    startActivity(intent);
+                }
+
+            }
+        });
+
+
         int i, maxIndex=0;
         int[] estCount =  new int[count];
         for(i=0;i<count;i++){
@@ -832,19 +876,21 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
                 estCount[i] = (getNumberOfEstablishmentsForRoute((PolylineOptions)poly.get(i)));
                 if(estCount[maxIndex]<estCount[i])
                     maxIndex = i;
-                //mMap.addPolyline((PolylineOptions)poly.get(i));
             }
         }
         for(i=0;i<count;i++){
             if(maxIndex != i) {
-                mMap.addPolyline((PolylineOptions) poly.get(i).color(Color.BLUE));
-            }
-            else{
-                mMap.addPolyline((PolylineOptions)poly.get(i).color(Color.MAGENTA));
+                PolylineOptions polylineOptions = poly.get(i);
+                polylineOptions.color(Color.RED);
+                Polyline polyline = mMap.addPolyline(polylineOptions);
+                polyline.setClickable(true);
             }
 
             }
-        mMap.addPolyline((PolylineOptions)poly.get(maxIndex).color(Color.MAGENTA));
+        PolylineOptions polylineOptions = poly.get(maxIndex);
+        polylineOptions.color(Color.BLUE);
+        Polyline polyline = mMap.addPolyline(polylineOptions);
+        polyline.setClickable(true);
 
         }
 
