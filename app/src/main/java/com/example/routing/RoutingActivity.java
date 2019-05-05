@@ -1,7 +1,9 @@
 package com.example.routing;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,10 +13,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
 
 import com.example.routing.RoutingHelpers.FetchURL;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +46,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -91,9 +101,10 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     private Polyline currentPolyline;
     HashMap<String,MarkerOptions> hashMapMarker;
     AutoCompleteTextView sourceAutoCompView, destAutoCompView;
-    String currLoc = "";
+    String currLoc = "", source = "", destination = "";
     String[] mPlaceType;
     Integer count;
+    DatabaseHelper mDatabaseHelper;
     //ListView nearbyHospList, nearbyPoliceList;
     //ArrayList<String> nearbyHospArray, nearbyPoliceArray;
     //HashMap<String, LatLng> hospitalNameToLatLngMap, policeNameToLatLngMap;
@@ -112,7 +123,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         getDirection = findViewById(R.id.btnGetDirection);
         hashMapMarker = new HashMap<>();
         mPlaceType = new String[]{"hospital", "police_station" ,"bank", "mosque", "movie_theatre" ,"mall", "hindu_temple", "restaurant", "hotel", "store", "atm"};
-
+        mDatabaseHelper = new DatabaseHelper(this);
 
 
        sourceAutoCompView = findViewById(R.id.sourceAutoCompleteTextView);
@@ -128,6 +139,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 String str = (String) adapterView.getItemAtPosition(position);
+                source = str;
                 Toast.makeText(RoutingActivity.this,"Source: "+str , Toast.LENGTH_LONG).show();
                 getDirection.setVisibility(View.VISIBLE);
 
@@ -185,6 +197,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             @Override
             public void onItemClick(AdapterView adapterView, View view, int position, long id) {
                 String str = (String) adapterView.getItemAtPosition(position);
+                destination = str;
                 Toast.makeText(RoutingActivity.this,"Destination: "+str , Toast.LENGTH_LONG).show();
 
                 //Making "Get route" button visible
@@ -825,6 +838,21 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         return url;
     }
 
+    public void AddData(String source, Marker sourceMark, String dest, Marker destMark, String waypoints) {
+        String sourcePoint = ""+sourceMark.getPosition().latitude+","+sourceMark.getPosition().longitude;
+        String destPoint = ""+destMark.getPosition().latitude+","+destMark.getPosition().longitude;
+        boolean insertData = mDatabaseHelper.addData(source, sourcePoint, dest, destPoint, waypoints);
+
+        if(!insertData) {
+            toastMessage("Something went wrong");
+        }
+    }
+
+
+    private void toastMessage(String message){
+        Toast.makeText(this,message, Toast.LENGTH_LONG).show();
+    }
+
     @Override
     public void onTaskDone(int count, List<PolylineOptions> poly) {
 
@@ -834,6 +862,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             public void onPolylineClick(Polyline polyline)
             {
                 polyline.setColor(Color.MAGENTA);
+
 
                 //Getting the waypoints for navigation
                 List<LatLng> listWay  = polyline.getPoints();
@@ -846,19 +875,22 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
                     point = listWay.get(iter);
                     waypoints[wayIndex]= "" + point.latitude + "," + point.longitude ;
                     wayIndex++;
-                    if(wayIndex==8 || iter >= listWay.size())
+                    if(wayIndex==8)
                         break;
                 }
 
                 String waypointStr = String.join("|", waypoints);
 
+
                 if (sourceMarker != null && destMarker != null) {
+                    AddData(source,sourceMarker, destination, destMarker, waypointStr);
                     String uri = "https://www.google.com/maps/dir/?api=1&origin=" + sourceMarker.getPosition().latitude + "," + sourceMarker.getPosition().longitude + "&destination=" + latitude + "," + longitude + "&waypoints=" + waypointStr + "&travelmode=driving&dir_action=navigate";
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
                     intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                     startActivity(intent);
                 }
                 if(sourceMarker == null && destMarker!=null){
+                    AddData(source,mCurrLocationMarker, destination, destMarker, waypointStr);
                     String uri = "https://www.google.com/maps/dir/?api=1&origin=" + mCurrLocationMarker.getPosition().latitude + "," + mCurrLocationMarker.getPosition().longitude + "&destination=" + latitude + "," + longitude + "&waypoints=" + waypointStr + "&travelmode=driving&dir_action=navigate";
                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
                     intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
@@ -882,6 +914,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             if(maxIndex != i) {
                 PolylineOptions polylineOptions = poly.get(i);
                 polylineOptions.color(Color.RED);
+                polylineOptions.width(9);
                 Polyline polyline = mMap.addPolyline(polylineOptions);
                 polyline.setClickable(true);
             }
@@ -889,6 +922,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
             }
         PolylineOptions polylineOptions = poly.get(maxIndex);
         polylineOptions.color(Color.BLUE);
+        polylineOptions.width(13);
         Polyline polyline = mMap.addPolyline(polylineOptions);
         polyline.setClickable(true);
 
