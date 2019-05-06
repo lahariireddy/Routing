@@ -62,6 +62,12 @@ import com.google.android.gms.location.LocationListener;
 
 
 import com.example.routing.RoutingHelpers.TaskLoadedCallback;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -105,6 +111,8 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     String[] mPlaceType;
     Integer count;
     DatabaseHelper mDatabaseHelper;
+    FirebaseDatabase database;
+    DatabaseReference databaseRef;
     //ListView nearbyHospList, nearbyPoliceList;
     //ArrayList<String> nearbyHospArray, nearbyPoliceArray;
     //HashMap<String, LatLng> hospitalNameToLatLngMap, policeNameToLatLngMap;
@@ -124,6 +132,13 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
         hashMapMarker = new HashMap<>();
         mPlaceType = new String[]{"hospital", "police_station" ,"bank", "mosque", "movie_theatre" ,"mall", "hindu_temple", "restaurant", "hotel", "store", "atm"};
         mDatabaseHelper = new DatabaseHelper(this);
+
+        database = FirebaseDatabase.getInstance();
+
+        /** Testing firebase **/
+
+        testFirebase();
+
 
 
        sourceAutoCompView = findViewById(R.id.sourceAutoCompleteTextView);
@@ -329,6 +344,23 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
 
     }
+
+
+
+
+    void testFirebase(){
+        long timemillis = System.currentTimeMillis();
+        databaseRef = database.getReference();
+        Feedback feedback = new Feedback(timemillis, "Koti", "2.34,1.456", "Banjara", "2.34,6.73", "1.23,12.34", 4, true, false, true, false);
+        databaseRef.push().setValue(feedback);
+
+
+    }
+
+
+
+
+
 
 
 
@@ -879,7 +911,13 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
                         break;
                 }
 
-                String waypointStr = String.join("|", waypoints);
+                String waypointStr = "";
+                int iWay = 1;
+                waypointStr+=waypoints[0];
+                while(iWay<waypoints.length) {
+                    waypointStr += "|" + waypoints[iWay];
+                    iWay++;
+                }
 
 
                 if (sourceMarker != null && destMarker != null) {
