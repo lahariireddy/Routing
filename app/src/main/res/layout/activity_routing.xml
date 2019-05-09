@@ -82,11 +82,11 @@
 
                 <ImageView
                     android:id="@+id/btnNearbyPoliceStations"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_police_stations"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/icons_police_badge_52"
                     android:background="@drawable/icons_background"
-                    android:padding="0dp"
+                    android:padding="6dp"
                     />
             </RelativeLayout>
 
