@@ -24,6 +24,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCXLP_pqSc2Otq7ZpT9SgXLdx4-CrRgv2M" />
 
+        <activity android:name=".GoogleSignInActivity"></activity>
         <activity android:name=".RoutingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

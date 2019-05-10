@@ -143,7 +143,7 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
         /** Testing firebase **/
 
-        testFirebase();
+        //testFirebase();
 
 
         sourceAutoCompView = findViewById(R.id.sourceAutoCompleteTextView);
@@ -341,18 +341,23 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
 
             }
         });
+        RelativeLayout reportLayout = findViewById(R.id.layout_report);
+        reportLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RoutingActivity.this,"Report", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RoutingActivity.this, GoogleSignInActivity.class);
+                startActivity(intent);
 
-
+            }
+        });
     }
-
 
     void testFirebase() {
         long timemillis = System.currentTimeMillis();
         databaseRef = database.getReference();
-        Feedback feedback = new Feedback(timemillis, "Koti", "2.34,1.456", "Banjara", "2.34,6.73", "1.23,12.34", 4, true, false, true, false);
-        databaseRef.push().setValue(feedback);
-
-
+        //Feedback feedback = new Feedback(timemillis, "Koti", "2.34,1.456", "Banjara", "2.34,6.73", "1.23,12.34", 4, true, false, true, false);
+        //databaseRef.push().setValue(feedback);
     }
 
 
