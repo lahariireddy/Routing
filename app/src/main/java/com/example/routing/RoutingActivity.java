@@ -356,8 +356,8 @@ public class RoutingActivity extends AppCompatActivity implements OnItemClickLis
     void testFirebase() {
         long timemillis = System.currentTimeMillis();
         databaseRef = database.getReference();
-        //Feedback feedback = new Feedback(timemillis, "Koti", "2.34,1.456", "Banjara", "2.34,6.73", "1.23,12.34", 4, true, false, true, false);
-        //databaseRef.push().setValue(feedback);
+        Feedback feedback = new Feedback(timemillis, "Koti", "2.34,1.456", "Banjara", "2.34,6.73", "1.23,12.34", 4, true, false, true, false);
+        databaseRef.push().setValue(feedback);
     }
 
 
