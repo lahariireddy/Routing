@@ -1,4 +1,4 @@
-package com.example.routing;
+package com.safethansorry;
 
 public class Feedback {
     public long timestamp;

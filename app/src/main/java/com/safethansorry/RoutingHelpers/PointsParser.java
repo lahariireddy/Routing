@@ -1,7 +1,6 @@
-package com.example.routing.RoutingHelpers;
+package com.safethansorry.RoutingHelpers;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 

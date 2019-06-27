@@ -1,4 +1,4 @@
-package com.example.routing;
+package com.safethansorry;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,7 +13,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_NAME = "people_table";
     private static final String COL1 = "ID";
-    private static final String COL2 = "Time";
+    private static final String COL2 = "time";
     private static final String COL3 = "origin";
     private static final String COL4 = "originLatLng";
     private static final String COL5 = "destination";

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#005eb4</color>
+    <color name="colorPrimaryDark">#192b43</color>
     <color name="colorAccent">#D81B60</color>
     <color name="grey">#DCDCDCDC</color>
     <color name="black">#000000</color>
@@ -9,7 +9,7 @@
     <color name="darkGrey">#ACACACAC</color>
     <color name="darkerGrey">#AE494949</color>
     <color name="borderGrey">#ACC0C0C0</color>
-    <color name="navBlue">#056DBE</color>
+    <color name="navBlue">#61b3e7</color>
     <color name="red">#DF4343</color>
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_300">#E0E0E0</color>

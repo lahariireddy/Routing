@@ -1,4 +1,4 @@
-package com.example.routing;
+package com.safethansorry;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -34,7 +35,6 @@ import com.google.firebase.database.FirebaseDatabase;
 /**
  * Demonstrate Firebase Authentication using a Google ID Token.
  */
-
 public class GoogleSignInActivity extends BaseActivity implements
         View.OnClickListener {
 
@@ -54,7 +54,7 @@ public class GoogleSignInActivity extends BaseActivity implements
     private TextView mDetailTextView;
 
     private String source, srcLatLng, destination, destLatLng, waypoints;
-    private Boolean val2,val3;
+    private boolean val2,val3;
     private float rating;
 
     @Override
@@ -209,24 +209,21 @@ public class GoogleSignInActivity extends BaseActivity implements
     {
         setContentView(R.layout.feedback_form);
         mDatabaseHelper = new DatabaseHelper(this);
-        database = FirebaseDatabase.getInstance();
-        final long timemillis = System.currentTimeMillis();
-        databaseRef = database.getReference();
-
         Cursor cursor=mDatabaseHelper.getLatestItem();
+
         String time;
         if (cursor.moveToFirst()){
-            do{
-                time = cursor.getString(cursor.getColumnIndex("COL2"));
-                source = cursor.getString(cursor.getColumnIndex("COL3"));
-                srcLatLng = cursor.getString(cursor.getColumnIndex("COL4"));
-                destination = cursor.getString(cursor.getColumnIndex("COL5"));
-                destLatLng = cursor.getString(cursor.getColumnIndex("COL6"));
-                waypoints = cursor.getString(cursor.getColumnIndex("COL7"));
+                //time = cursor.getString(cursor.getColumnIndex("time"));
+                source = cursor.getString(cursor.getColumnIndex("origin"));
+                srcLatLng = cursor.getString(cursor.getColumnIndex("originLatLng"));
+                destination = cursor.getString(cursor.getColumnIndex("destination"));
+                destLatLng = cursor.getString(cursor.getColumnIndex("destinationLatLng"));
+                waypoints = cursor.getString(cursor.getColumnIndex("waypoints"));
                 Toast.makeText(GoogleSignInActivity.this,
-                        "Rate your trip from "+source+" to "+destination + " at "+time,
+                        "Rate your trip from "+source+" to "+destination,
                         Toast.LENGTH_LONG).show();
-            }while(cursor.moveToNext());
+                time = "";
+
         }
         cursor.close();
 
@@ -262,7 +259,11 @@ public class GoogleSignInActivity extends BaseActivity implements
                     RadioButton radioButton
                             = (RadioButton)radioGroup2
                             .findViewById(selectedId);
-                    final Boolean val2=Boolean.parseBoolean(String.valueOf(radioButton.getText()));
+                    if (Boolean.parseBoolean(String.valueOf(radioButton.getText()))==true){
+                        val2=true;
+                    }else{
+                        val2=false;
+                    }
                 }
 
                 //Question 3
@@ -276,7 +277,7 @@ public class GoogleSignInActivity extends BaseActivity implements
                                                          int checkedId)
                             {
                                 RadioButton
-                                        radioButton
+                                        radioButton1
                                         = (RadioButton)group
                                         .findViewById(checkedId);
                             }
@@ -284,18 +285,26 @@ public class GoogleSignInActivity extends BaseActivity implements
                 selectedId = radioGroup3.getCheckedRadioButtonId();
                 if (selectedId == -1) { }
                 else {
-                    RadioButton radioButton
+                    RadioButton radioButton1
                             = (RadioButton)radioGroup3
                             .findViewById(selectedId);
-                    final Boolean val3=Boolean.parseBoolean(String.valueOf(radioButton.getText()));
+                    if (Boolean.parseBoolean(String.valueOf(radioButton1.getText()))==true){
+                        val3=true;
+                    }else{
+                        val3=false;
+                    }
                 }
 
-                Feedback feedback = new Feedback(timemillis,
-                        source, srcLatLng,
-                        destination, destLatLng,
-                        waypoints,
-                        rating,val2,val3,true, false);
+                database = FirebaseDatabase.getInstance();
+                final long timemillis = System.currentTimeMillis();
+                databaseRef = database.getReference();
+                Feedback feedback = new Feedback(timemillis, source, srcLatLng, destination, destLatLng, waypoints, rating,
+                        val2,val3,true, false);
                 databaseRef.push().setValue(feedback);
+
+                Toast.makeText(GoogleSignInActivity.this, "Thank you for your feedback!", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(GoogleSignInActivity.this, RoutingActivity.class);
+                startActivity(intent);
             }
         });
     }

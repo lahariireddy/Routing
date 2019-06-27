@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.routing">
+    package="com.safethansorry">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -24,8 +24,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCXLP_pqSc2Otq7ZpT9SgXLdx4-CrRgv2M" />
 
-        <activity android:name=".GoogleSignInActivity"></activity>
-        <activity android:name=".RoutingActivity">
+        <activity android:name="com.safethansorry.GoogleSignInActivity"></activity>
+        <activity android:name="com.safethansorry.RoutingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
